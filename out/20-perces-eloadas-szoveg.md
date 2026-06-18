@@ -2,7 +2,7 @@
 
 **Prezentáció:** `data-lake-wo-data-platform.pptx`  
 **Téma:** Data Lake adatplatform nélkül - valós idejű aggregáció 1 500 üzenet/mp sebességnél  
-**Időkeret:** 18 perc előadás + 5 perc Q&A
+**Időkeret:** 20 perc előadás + 5 perc Q&A
 
 > Javasolt használat: ne szó szerint felolvasott szövegként, hanem vezetett speaker scriptként. A ritmus akkor működik jól, ha a technikai részeknél hagysz fél-egy mondatnyi szünetet a diagramok értelmezésére.
 
@@ -10,8 +10,8 @@
 
 ## Slide 1 - Cím
 
-**Idő:** 0:40
-**Visszaszámláló:** 18:00 → 17:20
+**Idő:** 0:45
+**Visszaszámláló:** 20:00 → 19:15
 
 Sziasztok, Balázs vagyok, és ma arról fogok beszélni, hogyan lehet Data Lake-szerű működést megvalósítani klasszikus adatplatform nélkül.
 
@@ -23,21 +23,21 @@ A konkrét sztori egy telekommunikációs adatfolyamról szól: körülbelül 1 
 
 ## Slide 2 - Hook: Data Lake viselkedés platform nélkül
 
-**Idő:** 0:50
-**Visszaszámláló:** 17:20 → 16:30
+**Idő:** 1:00
+**Visszaszámláló:** 19:15 → 18:15
 
 A fő kérdés ez: mi történik akkor, ha Data Lake viselkedésre van szükségünk, de nincs mögötte klasszikus Data Lake platform?
 
 Data Lake alatt itt nem egy konkrét terméket értek, hanem azt a működést, hogy nyers adatot gyűjtünk, nem dobjuk el túl korán, és később többféle szempont szerint tudjuk feldolgozni.
 
-Csakhogy a valóságban sokszor nincs külön csapat, külön fürt, külön platform, és nincs végtelen mennyiségű üzemeltetési kapacitás. Itt is ez volt a helyzet: Kafka-ból jött az adat, MongoDB volt kéznél, és ebből kellett olyan rendszert építeni, ami nem csak demóban, hanem terhelés alatt is megbízható.
+Csakhogy a valóságban sokszor nincs külön csapat, külön platform, és nincs végtelen mennyiségű üzemeltetési kapacitás. Itt is ez volt a helyzet: Kafka-ból jött az adat, MongoDB volt kéznél, és ebből kellett olyan rendszert építeni, ami nem csak demóban, hanem terhelés alatt is megbízható.
 
 ---
 
 ## Slide 3 - About Me
 
-**Idő:** 1:00
-**Visszaszámláló:** 16:30 → 15:30
+**Idő:** 1:05
+**Visszaszámláló:** 18:15 → 17:10
 
 Röviden rólam, hogy legyen kontextus, honnan nézem ezt a problémát.
 
@@ -51,8 +51,8 @@ A konkrét domain pedig telekommunikáció: otthoni eszközök, hálózati topol
 
 ## Slide 4 - Business Requirement
 
-**Idő:** 1:35
-**Visszaszámláló:** 15:30 → 13:55
+**Idő:** 1:45
+**Visszaszámláló:** 17:10 → 15:25
 
 Nézzük az üzleti problémát.
 
@@ -60,16 +60,14 @@ Telekommunikációs home gateway eszközökről érkezik telemetria. A home gate
 
 A nagyságrend itt a lényeg. Sok eszköz, folyamatos adatérkezés, nagyjából 1 500 üzenet másodpercenként. Emellett az adatoknak történeti jelentése is van. Nem elég azt tudni, hogy egy eszköznek most rossz a jelszintje. Az üzleti kérdés sokkal inkább az: rossz volt-e tartósan? Két napja is ilyen volt? Ugyanez látszott a topológiában? Ez lokális hiba, vagy hálózati mintázat?
 
-Ezért van szükség nyers adat megtartására és hosszabb időablakban való gondolkodásra. A 48 órás mintadetektálási ablak azt jelenti, hogy az aggregáció nem lehet pusztán pillanatkép. Időbeli viselkedést kell tudnunk értelmezni.
-
-És mindezt úgy, hogy nincs külön számítási infrastruktúra, nincs dedikált adatplatform, hanem a rendelkezésre álló rendszerrel kell dolgozni.
+Ezért van szükség nyers adat megtartására és hosszabb időablakban való gondolkodásra. A nyers adat kell ahhoz is, hogy az operátor grafikusan vissza tudja nézni egy eszköz historikus hálózati topológiáját.
 
 ---
 
 ## Slide 5 - Topológia / üzleti valóság
 
-**Idő:** 0:45
-**Visszaszámláló:** 13:55 → 13:10
+**Idő:** 0:50
+**Visszaszámláló:** 15:25 → 14:35
 
 Ezen a képen az látszik, hogy az adat mögött valódi hálózati kapcsolatok, eszközök és topológiák vannak.
 
@@ -81,14 +79,14 @@ Ezért fontos a Data Lake szemlélet: ha túl korán dobjuk el a részleteket, k
 
 ## Slide 6 - Signal level / konkrét üzleti kérdés
 
-**Idő:** 0:45
-**Visszaszámláló:** 13:10 → 12:25
+**Idő:** 0:50
+**Visszaszámláló:** 14:35 → 13:45
 
 Itt egy egyszerűbb, de nagyon tipikus példa: signal level, vagyis jelszint.
 
 Egyetlen mérés alapján nem feltétlenül tudjuk, hogy baj van. Az érdekes kérdés az időbeli mintázat: tartósan alacsony-e a jel, mióta ilyen, és ugyanez történik-e más eszközöknél is?
 
-Ezért az aggregáció nem csak teljesítménykérdés, hanem helyességi kérdés is. Egyéni hibabejelentésnél az operátor ez alapján tud beavatkozást végezni. Ha késik az aggregáció, régi állapotot lát; ha rossz időbélyeg alapján aggregálunk, hibás következtetést vonhatunk le.
+Ezért az aggregáció nem csak teljesítménykérdés, hanem helyességi kérdés is. Ez egy másik use case: az operátor a home gateway állapota alapján indít beavatkozást. Ha késik az aggregáció, régi állapotot lát; ha rossz időbélyeg alapján aggregálunk, hibás következtetést vonhatunk le.
 
 Innen indulnak az első próbálkozások.
 
@@ -96,8 +94,8 @@ Innen indulnak az első próbálkozások.
 
 ## Slide 7 - First Try: Spark
 
-**Idő:** 1:00
-**Visszaszámláló:** 12:25 → 11:25
+**Idő:** 1:05
+**Visszaszámláló:** 13:45 → 12:40
 
 Az első megközelítés technikailag teljesen védhető volt: használjunk Sparkot.
 
@@ -105,9 +103,9 @@ Kafka-ból jön az adat, Spark feldolgozza és aggregálja, MongoDB-ben pedig el
 
 Éles környezetben viszont ez nálunk nem működött jól.
 
-Az első probléma az üzemeltetési teher volt. Memória, végrehajtók, partíciók, erőforrás-allokáció - ezeket érteni és folyamatosan gondozni kell. Ha van erre platform és csapat, rendben. Ha nincs, akkor a Spark nem csak megoldás, hanem plusz rendszer.
+Az első probléma az üzemeltetési teher volt. Memória, executors, partíciók, erőforrás-allokáció - ezeket érteni és folyamatosan gondozni kell. Ha van erre platform és csapat, rendben. Ha nincs, akkor a Spark nem csak megoldás, hanem plusz rendszer.
 
-A második probléma az erőforrás-versengés volt. Ugyanazon az infrastruktúrán futott volna, ahol az alkalmazás többi része is. Terhelés alatt ez kiszámíthatatlan viselkedést eredményezett.
+A második probléma a resource contention volt. Ugyanazon az infrastruktúrán futott volna, ahol az alkalmazás többi része is. Terhelés alatt ez kiszámíthatatlan viselkedést eredményezett.
 
 De a legfontosabb tanulság: nem láttuk eléggé, mi történik. Nem volt rendes monitoring, nem volt dashboard, nem volt egyszerű válasz arra, hogy le vagyunk-e maradva.
 
@@ -115,8 +113,8 @@ De a legfontosabb tanulság: nem láttuk eléggé, mi történik. Nem volt rende
 
 ## Slide 8 - First Try: Scheduled Aggregation Jobs
 
-**Idő:** 1:20
-**Visszaszámláló:** 11:25 → 10:05
+**Idő:** 1:30
+**Visszaszámláló:** 12:40 → 11:10
 
 A második próbálkozás sokkal egyszerűbbnek tűnt.
 
@@ -136,8 +134,8 @@ Ez a scheduled job megközelítés csapdája: egyszerűnek látszik, de folyamat
 
 ## Slide 9 - Az első próbák közös tanulsága
 
-**Idő:** 0:50
-**Visszaszámláló:** 10:05 → 09:15
+**Idő:** 1:00
+**Visszaszámláló:** 11:10 → 10:10
 
 Ez a dia a két zsákutca közös tanulságát foglalja össze.
 
@@ -151,8 +149,8 @@ Itt érdemes egy gyors kérdést feltenni: ki használ AI-t kódírásra, és ki
 
 ## Slide 10 - What's in the Box?
 
-**Idő:** 1:00
-**Visszaszámláló:** 09:15 → 08:15
+**Idő:** 1:05
+**Visszaszámláló:** 10:10 → 09:05
 
 Itt látszik a végül használt technológiai készlet.
 
@@ -164,8 +162,8 @@ Fontos, hogy itt nincsen Spark, nincsen Flink, nincsen Hadoop. Nem azért, mert 
 
 ## Slide 11 - Solution
 
-**Idő:** 2:00
-**Visszaszámláló:** 08:15 → 06:15
+**Idő:** 2:10
+**Visszaszámláló:** 09:05 → 06:55
 
 A végső megoldás lényege: időszakos lekérdezés helyett eseményvezérelt feldolgozás.
 
@@ -175,7 +173,7 @@ Ezután a MongoDB Change Stream figyeli a beszúrási eseményeket. Amikor új d
 
 A processzor nem minden dokumentumra külön ír aggregátumot. Mikro-köteg ablakot használ, jellemzően 200-500 milliszekundum körül. Ez azért fontos, mert így drasztikusan csökkentjük a MongoDB felé indított adatbázis-műveletek számát. Sok kis módosítás helyett tömeges írásokat tudunk használni, `$inc` és beszúrás-vagy-frissítés logikával.
 
-A folytatási token adja az újraindításbiztos működést. Ha a processzor újraindul, tudja, honnan kell folytatni a Change Stream olvasását. Ez kulcskérdés, mert adatfolyam-feldolgozásnál az újraindítás nem lehet adatvesztési pont.
+A resume token adja az újraindításbiztos működést. Ha a processzor újraindul, tudja, honnan kell folytatni a Change Stream olvasását. Ez kulcskérdés, mert adatfolyam-feldolgozásnál az újraindítás nem lehet adatvesztési pont.
 
 Szándékosan egyetlen feldolgozó példány dolgozik az aggregáción. Ez korlátnak hangozhat, de itt előny volt: nincs elosztott konszenzus, nincs szétszabdalt állapot, nincs zárolási bonyolultság. A mért kapacitás így is bőven az aktuális terhelés fölött volt: több mint 6 000 üzenet másodpercenként, nagyjából 1-2 másodperces végponttól végpontig mért késéssel.
 
@@ -185,8 +183,8 @@ A scheduled jobok nem tűntek el, csak más szerepet kaptak: visszatöltés, tak
 
 ## Slide 12 - Monitoring overview
 
-**Idő:** 1:20
-**Visszaszámláló:** 06:15 → 04:55
+**Idő:** 1:30
+**Visszaszámláló:** 06:55 → 05:25
 
 Itt jön a másik nagy tanulság: a monitoring nem kiegészítő funkció. A monitoring az architektúra része.
 
@@ -200,8 +198,8 @@ Az alerting ugyanilyen fontos. A dashboard segít vizsgálódni, de az alert mon
 
 ## Slide 13 - Kafka throughput
 
-**Idő:** 0:40
-**Visszaszámláló:** 04:55 → 04:15
+**Idő:** 0:45
+**Visszaszámláló:** 05:25 → 04:40
 
 Kafka oldalon az első kérdés egyszerű: folyik-e be adat olyan ütemben, ahogy várjuk?
 
@@ -213,8 +211,8 @@ Ezt azért kell a folyamat elején mérni, mert minden későbbi metrika értelm
 
 ## Slide 14 - Kafka reading / consumer lag
 
-**Idő:** 0:40
-**Visszaszámláló:** 04:15 → 03:35
+**Idő:** 0:45
+**Visszaszámláló:** 04:40 → 03:55
 
 A második Kafka metrika a consumer lag.
 
@@ -226,8 +224,8 @@ Itt már nem csak throughputról beszélünk, hanem frissességről. A közel va
 
 ## Slide 15 - MongoDB Change Stream
 
-**Idő:** 0:50
-**Visszaszámláló:** 03:35 → 02:45
+**Idő:** 0:55
+**Visszaszámláló:** 03:55 → 03:00
 
 A Change Stream a megoldás központi eleme.
 
@@ -241,8 +239,8 @@ Ez különösen fontos történeti adatoknál, ahol a device által küldött id
 
 ## Slide 16 - Change Stream lag and buffer
 
-**Idő:** 0:50
-**Visszaszámláló:** 02:45 → 01:55
+**Idő:** 0:55
+**Visszaszámláló:** 03:00 → 02:05
 
 Ezen a dián két kulcsjel látszik: Change Stream lag és buffer size.
 
@@ -256,8 +254,8 @@ Ezért kell együtt nézni a batch size-t, a flush frequency-t és a bulk write 
 
 ## Slide 17 - TTL
 
-**Idő:** 0:45
-**Visszaszámláló:** 01:55 → 01:10
+**Idő:** 0:50
+**Visszaszámláló:** 02:05 → 01:15
 
 A nyers adat megtartása nem ingyen van. Ha másodpercenként 1 500 dokumentum érkezik, az adatmegőrzés gyorsan tárhely- és teljesítménykérdéssé válik.
 
@@ -269,8 +267,8 @@ Itt is ugyanaz a kérdés: a beszúrási sebesség és a törlési sebesség egy
 
 ## Slide 18 - TTL broken
 
-**Idő:** 0:50
-**Visszaszámláló:** 01:10 → 00:20
+**Idő:** 0:55
+**Visszaszámláló:** 01:15 → 00:20
 
 Ez a "broken" TTL állapot tanulsága.
 
