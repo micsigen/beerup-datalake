@@ -171,7 +171,7 @@ A Kafka-olvasó kötegekben írja be a nyers dokumentumokat MongoDB-be. Ez megta
 
 Ezután a MongoDB Change Stream figyeli a beszúrási eseményeket. Amikor új dokumentum kerül a nyers gyűjteménybe, a feldolgozó megkapja ezt az eseményt. Nem kell percenként újraolvasni a gyűjteményt, és nem kell keresni, mi változott.
 
-A processzor nem minden dokumentumra külön ír aggregátumot. Mikro-köteg ablakot használ, jellemzően 200-500 milliszekundum körül. Ez azért fontos, mert így drasztikusan csökkentjük a MongoDB felé indított adatbázis-műveletek számát. Sok kis módosítás helyett tömeges írásokat tudunk használni, `$inc` és beszúrás-vagy-frissítés logikával.
+A processzor nem minden dokumentumra külön ír aggregátumot. Egy micro-batch ablakot használ, jellemzően 200-500 milliszekundum körül. Ez azért fontos, mert így drasztikusan csökkentjük a MongoDB felé indított adatbázis-műveletek számát. Sok kis módosítás helyett tömeges írásokat tudunk használni, `$inc` és upsert logikával.
 
 A resume token adja az újraindításbiztos működést. Ha a processzor újraindul, tudja, honnan kell folytatni a Change Stream olvasását. Ez kulcskérdés, mert adatfolyam-feldolgozásnál az újraindítás nem lehet adatvesztési pont.
 
